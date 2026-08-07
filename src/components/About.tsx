@@ -8,7 +8,7 @@ export default function About() {
   const { t } = useApp();
 
   const facts = [
-    { icon: <Smartphone size={20} />, value: "4+", label: t.about.facts.apps },
+    { icon: <Smartphone size={20} />, value: "5+", label: t.about.facts.apps },
     { icon: <Globe size={20} />, value: t.about.facts.platforms, label: "" },
     { icon: <Zap size={20} />, value: t.about.facts.focus, label: "" },
   ];
@@ -18,6 +18,7 @@ export default function About() {
       <div className="mx-auto max-w-4xl">
         <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">{t.about.heading}</h2>
         <p className="mt-6 text-lg leading-relaxed text-[var(--color-text-secondary)]">{t.about.bio}</p>
+        <p className="mt-4 text-lg leading-relaxed text-[var(--color-text-secondary)]">{t.about.bio2}</p>
         <div className="mt-10 flex flex-wrap gap-4">
           {facts.map((fact, i) => (
             <div key={i} className="flex items-center gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-5 py-3">
