@@ -39,3 +39,10 @@ export const platformStoreLabel: Record<Platform, string> = {
   Web: "Website",
   macOS: "Mac App Store",
 };
+
+// Official store badge images (rendered instead of a plain colored button)
+export const platformBadgeImage: Partial<Record<Platform, string>> = {
+  iOS: "https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83",
+  macOS: "https://tools.applemediaservices.com/api/badges/download-on-the-mac-app-store/black/en-us?size=250x83",
+  Android: "https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png",
+};

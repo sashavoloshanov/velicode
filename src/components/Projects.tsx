@@ -3,7 +3,7 @@
 import { useApp } from "@/lib/context";
 import { ExternalLink, Clock } from "lucide-react";
 import { GithubIcon } from "./Icons";
-import { platformBadgeStyles, platformButtonStyles, platformStoreLabel, type Platform } from "@/lib/platforms";
+import { platformBadgeStyles, platformButtonStyles, platformStoreLabel, platformBadgeImage, type Platform } from "@/lib/platforms";
 
 export default function Projects() {
   const { t } = useApp();
@@ -19,13 +19,15 @@ export default function Projects() {
               className="group overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] transition-shadow hover:shadow-lg"
             >
               {"image" in project && project.image && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={project.image}
-                  alt={project.name}
-                  className="h-48 w-full object-cover sm:h-64"
-                  loading="lazy"
-                />
+                <div className="w-full bg-[var(--color-bg-secondary)]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={project.image}
+                    alt={project.name}
+                    className="h-auto w-full object-contain"
+                    loading="lazy"
+                  />
+                </div>
               )}
               <div className="p-6 sm:p-8">
                 <div className="flex flex-wrap items-start justify-between gap-4">
@@ -50,20 +52,41 @@ export default function Projects() {
                       ))}
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     {"links" in project &&
-                      project.links.map((link) => (
-                        <a
-                          key={link.platform}
-                          href={link.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors ${platformButtonStyles[link.platform as Platform] ?? "bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)]"}`}
-                        >
-                          <ExternalLink size={14} />
-                          {platformStoreLabel[link.platform as Platform] ?? t.projects.viewStore}
-                        </a>
-                      ))}
+                      project.links.map((link) => {
+                        const badge = platformBadgeImage[link.platform as Platform];
+                        if (badge) {
+                          return (
+                            <a
+                              key={link.platform}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-block"
+                            >
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={badge}
+                                alt={platformStoreLabel[link.platform as Platform] ?? t.projects.viewStore}
+                                className="h-11 w-auto rounded-lg"
+                              />
+                            </a>
+                          );
+                        }
+                        return (
+                          <a
+                            key={link.platform}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors ${platformButtonStyles[link.platform as Platform] ?? "bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)]"}`}
+                          >
+                            <ExternalLink size={14} />
+                            {platformStoreLabel[link.platform as Platform] ?? t.projects.viewStore}
+                          </a>
+                        );
+                      })}
                     {"githubUrl" in project && project.githubUrl && (
                       <a
                         href={project.githubUrl}

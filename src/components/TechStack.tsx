@@ -50,15 +50,17 @@ export default function TechStack() {
                     key={tech.name}
                     className="flex flex-col items-start gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 transition-shadow hover:shadow-md"
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={tech.logo}
-                      alt={tech.name}
-                      width={36}
-                      height={36}
-                      className="h-9 w-9 dark:brightness-0 dark:invert"
-                      loading="lazy"
-                    />
+                    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white p-2.5 shadow-sm">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={tech.logo}
+                        alt={tech.name}
+                        width={36}
+                        height={36}
+                        className="h-full w-full object-contain"
+                        loading="lazy"
+                      />
+                    </div>
                     <div>
                       <div className="text-base font-semibold">{tech.name}</div>
                       <div className="mt-0.5 text-xs text-[var(--color-text-secondary)]">{tech.subtitle}</div>
