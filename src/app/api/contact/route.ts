@@ -16,6 +16,7 @@ export async function POST(request: Request) {
     const workTypeStr = workType || "Not specified";
     const timelineStr = timeline || "Not specified";
     const descriptionStr = description || "Not specified";
+    const statusStr = "New";
 
     if (process.env.GOOGLE_CREDENTIALS && process.env.GOOGLE_SHEET_ID) {
       try {
@@ -27,17 +28,17 @@ export async function POST(request: Request) {
         const sheets = google.sheets({ version: "v4", auth });
         await sheets.spreadsheets.values.append({
           spreadsheetId: process.env.GOOGLE_SHEET_ID,
-          range: "Sheet1!A:F",
+          range: "Sheet1!A:G",
           valueInputOption: "USER_ENTERED",
           requestBody: {
-            values: [[timestamp, email, platformsStr, workTypeStr, timelineStr, descriptionStr]],
+            values: [[timestamp, email, platformsStr, workTypeStr, timelineStr, descriptionStr, statusStr]],
           },
         });
       } catch (sheetError) {
         console.error("Google Sheets error:", sheetError);
       }
     } else {
-      console.log("Google Sheets not configured. Submission:", { timestamp, email, platformsStr, workTypeStr, timelineStr, descriptionStr });
+      console.log("Google Sheets not configured. Submission:", { timestamp, email, platformsStr, workTypeStr, timelineStr, descriptionStr, statusStr });
     }
 
     if (process.env.RESEND_API_KEY) {
