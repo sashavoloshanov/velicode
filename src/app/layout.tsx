@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AppProvider } from "@/lib/context";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "Velicode \u2014 iOS, Android & Web App Development",
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="font-sans antialiased" style={{ fontFamily: "'Inter', sans-serif" }}>
         <AppProvider>{children}</AppProvider>
+        <Analytics />
       </body>
     </html>
   );
