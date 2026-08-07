@@ -4,20 +4,40 @@ import { useState } from "react";
 import { useApp } from "@/lib/context";
 import { Send, CheckCircle, AlertCircle } from "lucide-react";
 import { LinkedinIcon } from "./Icons";
+import { platformToggleStyles, type Platform } from "@/lib/platforms";
 
 export default function ContactForm() {
   const { t } = useApp();
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
-  const [form, setForm] = useState({ email: "", platform: "iOS", deadline: "", description: "" });
+  const [form, setForm] = useState({
+    email: "",
+    platforms: [] as string[],
+    workType: "",
+    timeline: "",
+    description: "",
+  });
+
+  const togglePlatform = (p: string) => {
+    setForm((prev) => ({
+      ...prev,
+      platforms: prev.platforms.includes(p) ? prev.platforms.filter((x) => x !== p) : [...prev.platforms, p],
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("sending");
     try {
       const res = await fetch("/api/contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
-      if (res.ok) { setStatus("success"); setForm({ email: "", platform: "iOS", deadline: "", description: "" }); }
-      else { setStatus("error"); }
-    } catch { setStatus("error"); }
+      if (res.ok) {
+        setStatus("success");
+        setForm({ email: "", platforms: [], workType: "", timeline: "", description: "" });
+      } else {
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
+    }
   };
 
   if (status === "success") {
@@ -36,32 +56,72 @@ export default function ContactForm() {
       <div className="mx-auto max-w-2xl">
         <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">{t.contact.heading}</h2>
         <p className="mt-3 text-[var(--color-text-secondary)]">{t.contact.subtitle}</p>
-        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div>
             <label htmlFor="email" className="mb-1.5 block text-sm font-medium">{t.contact.fields.email}</label>
             <input type="text" id="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--color-accent)]" />
           </div>
+
           <div>
-            <label htmlFor="platform" className="mb-1.5 block text-sm font-medium">{t.contact.fields.platform}</label>
-            <select id="platform" value={form.platform} onChange={(e) => setForm({ ...form, platform: e.target.value })} className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--color-accent)]">
-              {t.contact.fields.platformOptions.map((opt) => (<option key={opt} value={opt}>{opt}</option>))}
-            </select>
+            <label className="mb-2 block text-sm font-medium">{t.contact.fields.platform}</label>
+            <div className="flex flex-wrap gap-2">
+              {t.contact.fields.platformOptions.map((opt) => {
+                const active = form.platforms.includes(opt);
+                const styles = platformToggleStyles[opt as Platform];
+                return (
+                  <button key={opt} type="button" onClick={() => togglePlatform(opt)} className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${active ? styles.active : styles.inactive}`}>
+                    {opt}
+                  </button>
+                );
+              })}
+            </div>
           </div>
+
           <div>
-            <label htmlFor="deadline" className="mb-1.5 block text-sm font-medium">{t.contact.fields.deadline}</label>
-            <input type="text" id="deadline" value={form.deadline} onChange={(e) => setForm({ ...form, deadline: e.target.value })} placeholder={t.contact.fields.deadlinePlaceholder} className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] px-4 py-3 text-sm outline-none transition-colors placeholder:text-[var(--color-text-secondary)]/50 focus:border-[var(--color-accent)]" />
+            <label className="mb-2 block text-sm font-medium">{t.contact.fields.workType}</label>
+            <div className="flex flex-wrap gap-2">
+              {t.contact.fields.workTypeOptions.map((opt) => (
+                <button key={opt.value} type="button" onClick={() => setForm({ ...form, workType: opt.value })} className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${form.workType === opt.value ? "border-[var(--color-accent)] bg-[var(--color-accent)] text-white" : "border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-accent)]/50"}`}>
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </div>
+
           <div>
-            <label htmlFor="description" className="mb-1.5 block text-sm font-medium">{t.contact.fields.description}</label>
-            <textarea id="description" required rows={5} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder={t.contact.fields.descriptionPlaceholder} className="w-full resize-none rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] px-4 py-3 text-sm outline-none transition-colors placeholder:text-[var(--color-text-secondary)]/50 focus:border-[var(--color-accent)]" />
+            <label className="mb-2 block text-sm font-medium">{t.contact.fields.timeline}</label>
+            <div className="flex flex-wrap gap-2">
+              {t.contact.fields.timelineOptions.map((opt) => (
+                <button key={opt.value} type="button" onClick={() => setForm({ ...form, timeline: opt.value })} className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${form.timeline === opt.value ? "border-[var(--color-accent)] bg-[var(--color-accent)] text-white" : "border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-accent)]/50"}`}>
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </div>
-          {status === "error" && (<div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400"><AlertCircle size={16} />{t.contact.error}</div>)}
+
+          <div>
+            <label htmlFor="description" className="mb-1.5 block text-sm font-medium">
+              {t.contact.fields.description} <span className="font-normal text-[var(--color-text-secondary)]">{t.contact.fields.descriptionOptional}</span>
+            </label>
+            <textarea id="description" rows={5} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder={t.contact.fields.descriptionPlaceholder} className="w-full resize-none rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] px-4 py-3 text-sm outline-none transition-colors placeholder:text-[var(--color-text-secondary)]/50 focus:border-[var(--color-accent)]" />
+          </div>
+
+          {status === "error" && (
+            <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
+              <AlertCircle size={16} />
+              {t.contact.error}
+            </div>
+          )}
+
           <div className="flex flex-wrap items-center gap-4">
             <button type="submit" disabled={status === "sending"} className="inline-flex items-center gap-2 rounded-full bg-[var(--color-accent)] px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--color-accent-hover)] disabled:opacity-50">
-              <Send size={16} />{t.contact.submit}
+              <Send size={16} />
+              {t.contact.submit}
             </button>
             <a href="https://www.linkedin.com/in/oleksandr-v-84a067105/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-accent)]">
-              <LinkedinIcon size={16} />LinkedIn
+              <LinkedinIcon size={16} />
+              LinkedIn
             </a>
           </div>
         </form>
