@@ -32,7 +32,7 @@ export default function Projects() {
                   <div>
                     <div className="flex items-center gap-3">
                       <h3 className="text-2xl font-bold">{project.name}</h3>
-                      {"comingSoon" in project && project.comingSoon && (
+                      {Boolean((project as { comingSoon?: boolean }).comingSoon) && (
                         <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
                           <Clock size={12} />
                           {t.projects.comingSoon}
