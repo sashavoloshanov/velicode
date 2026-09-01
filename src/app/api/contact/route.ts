@@ -81,7 +81,7 @@ export async function POST(request: Request) {
             from: process.env.RESEND_FROM_EMAIL || "Velicode <onboarding@resend.dev>",
             to: email,
             subject: "Thank you for your project request!",
-            html: `<div style="font-family: sans-serif; max-width: 480px;"><h2>Thank you for reaching out!</h2><p>We received your project request and we're glad you're interested in working with us.</p><p>We'll review your details and get back to you within 24 hours.</p><br/><p>Best regards,<br/>Velicode<br/><a href="https://velicode.vercel.app">velicode.vercel.app</a></p></div>`,
+            html: `<div style="font-family: sans-serif; max-width: 480px;"><h2>Thank you for reaching out!</h2><p>We received your project request and we're glad you're interested in working with us.</p><p>We'll review your details and get back to you within 24 hours.</p><br/><p>Best regards,<br/>Velicode<br/><a href="https://www.velicode.app">velicode.app</a></p></div>`,
           });
         }
 
