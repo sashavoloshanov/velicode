@@ -119,7 +119,7 @@ export default function ContactForm() {
               <Send size={16} />
               {t.contact.submit}
             </button>
-            <a href="https://www.linkedin.com/in/oleksandr-v-84a067105/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-accent)]">
+            <a href="https://www.linkedin.com/company/velicode-app" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-accent)]">
               <LinkedinIcon size={16} />
               LinkedIn
             </a>
