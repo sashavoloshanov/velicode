@@ -1,6 +1,6 @@
 # Velicode
 
-**[velicode.vercel.app](https://velicode.vercel.app)**
+**[velicode.app](https://www.velicode.app)**
 
 Portfolio & project-request website for a native iOS, Android & Web development studio. Bilingual (EN/UA), with a live contact form that saves submissions to Google Sheets and sends automated email replies.
 
@@ -56,6 +56,6 @@ Push to `main` — Vercel auto-deploys.
 
 ## Links
 
-- **Live site:** [velicode.vercel.app](https://velicode.vercel.app)
-- **LinkedIn:** [linkedin.com/in/oleksandr-v-84a067105](https://www.linkedin.com/in/oleksandr-v-84a067105/)
+- **Live site:** [velicode.app](https://www.velicode.app)
+- **LinkedIn:** [linkedin.com/company/velicode-app](https://www.linkedin.com/company/velicode-app)
 - **GitHub:** [github.com/sashavoloshanov](https://github.com/sashavoloshanov)
