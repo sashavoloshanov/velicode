@@ -16,7 +16,7 @@ export default function Footer() {
         </div>
         <div className="flex items-center gap-4">
           <a href="https://github.com/sashavoloshanov" target="_blank" rel="noopener noreferrer" className="text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text)]" aria-label="GitHub"><GithubIcon size={18} /></a>
-          <a href="https://www.linkedin.com/in/oleksandr-v-84a067105/" target="_blank" rel="noopener noreferrer" className="text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text)]" aria-label="LinkedIn"><LinkedinIcon size={18} /></a>
+          <a href="https://www.linkedin.com/company/velicode-app" target="_blank" rel="noopener noreferrer" className="text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text)]" aria-label="LinkedIn"><LinkedinIcon size={18} /></a>
         </div>
       </div>
     </footer>
