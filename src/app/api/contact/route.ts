@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { google } from "googleapis";
 import { Resend } from "resend";
+import { buildMessageText, buildKeyboard, telegramCall, findRowByTimestamp, updateRow, type RequestRow } from "@/lib/telegramBot";
 
 export async function POST(request: Request) {
   try {
@@ -28,10 +29,10 @@ export async function POST(request: Request) {
         const sheets = google.sheets({ version: "v4", auth });
         await sheets.spreadsheets.values.append({
           spreadsheetId: process.env.GOOGLE_SHEET_ID,
-          range: "Sheet1!A:G",
+          range: "Sheet1!A:K",
           valueInputOption: "USER_ENTERED",
           requestBody: {
-            values: [[timestamp, email, platformsStr, workTypeStr, timelineStr, descriptionStr, statusStr]],
+            values: [[timestamp, email, platformsStr, workTypeStr, timelineStr, descriptionStr, statusStr, "new", "", "", ""]],
           },
         });
       } catch (sheetError) {
@@ -41,30 +42,38 @@ export async function POST(request: Request) {
       console.log("Google Sheets not configured. Submission:", { timestamp, email, platformsStr, workTypeStr, timelineStr, descriptionStr, statusStr });
     }
 
-    // --- Telegram: instant notification ---
+    // --- Telegram: instant notification with interactive workflow buttons ---
     if (process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID) {
       try {
-        const escapeHtml = (str: string) =>
-          str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        const row: RequestRow = {
+          rowIndex: -1,
+          timestamp,
+          contact: email,
+          platforms: platformsStr,
+          workType: workTypeStr,
+          timeline: timelineStr,
+          description: descriptionStr,
+          status: statusStr,
+          stage: "new",
+          clientNotes: "",
+          revisionNotes: "",
+          trackingMessageId: "",
+        };
 
-        const message =
-          `🆕 <b>New project request</b>\n\n` +
-          `<b>Contact:</b> ${escapeHtml(email)}\n` +
-          `<b>Platforms:</b> ${escapeHtml(platformsStr)}\n` +
-          `<b>Type of work:</b> ${escapeHtml(workTypeStr)}\n` +
-          `<b>Timeline:</b> ${escapeHtml(timelineStr)}\n` +
-          `<b>Description:</b> ${escapeHtml(descriptionStr)}\n\n` +
-          `<i>${new Date(timestamp).toLocaleString("en-GB", { timeZone: "Europe/Kyiv" })}</i>`;
-
-        await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            chat_id: process.env.TELEGRAM_CHAT_ID,
-            text: message,
-            parse_mode: "HTML",
-          }),
+        const result = await telegramCall("sendMessage", {
+          chat_id: process.env.TELEGRAM_CHAT_ID,
+          text: buildMessageText(row),
+          parse_mode: "HTML",
+          reply_markup: buildKeyboard("new", timestamp),
         });
+
+        const messageId = result?.result?.message_id;
+        if (messageId && process.env.GOOGLE_CREDENTIALS && process.env.GOOGLE_SHEET_ID) {
+          const savedRow = await findRowByTimestamp(timestamp);
+          if (savedRow) {
+            await updateRow(savedRow.rowIndex, { trackingMessageId: String(messageId) });
+          }
+        }
       } catch (telegramError) {
         console.error("Telegram error:", telegramError);
       }
