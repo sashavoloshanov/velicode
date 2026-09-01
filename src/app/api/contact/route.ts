@@ -41,6 +41,37 @@ export async function POST(request: Request) {
       console.log("Google Sheets not configured. Submission:", { timestamp, email, platformsStr, workTypeStr, timelineStr, descriptionStr, statusStr });
     }
 
+    // --- Telegram: instant notification ---
+    if (process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID) {
+      try {
+        const escapeHtml = (str: string) =>
+          str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+        const message =
+          `🆕 <b>New project request</b>\n\n` +
+          `<b>Contact:</b> ${escapeHtml(email)}\n` +
+          `<b>Platforms:</b> ${escapeHtml(platformsStr)}\n` +
+          `<b>Type of work:</b> ${escapeHtml(workTypeStr)}\n` +
+          `<b>Timeline:</b> ${escapeHtml(timelineStr)}\n` +
+          `<b>Description:</b> ${escapeHtml(descriptionStr)}\n\n` +
+          `<i>${new Date(timestamp).toLocaleString("en-GB", { timeZone: "Europe/Kyiv" })}</i>`;
+
+        await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: process.env.TELEGRAM_CHAT_ID,
+            text: message,
+            parse_mode: "HTML",
+          }),
+        });
+      } catch (telegramError) {
+        console.error("Telegram error:", telegramError);
+      }
+    } else {
+      console.log("Telegram not configured. Skipping notification.");
+    }
+
     if (process.env.RESEND_API_KEY) {
       try {
         const resend = new Resend(process.env.RESEND_API_KEY);
