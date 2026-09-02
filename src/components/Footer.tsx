@@ -1,7 +1,7 @@
 "use client";
 
 import { useApp } from "@/lib/context";
-import { GithubIcon, LinkedinIcon } from "./Icons";
+import { GithubIcon, LinkedinIcon, InstagramIcon, ThreadsIcon } from "./Icons";
 
 export default function Footer() {
   const { t } = useApp();
@@ -17,6 +17,8 @@ export default function Footer() {
         <div className="flex items-center gap-4">
           <a href="https://github.com/sashavoloshanov" target="_blank" rel="noopener noreferrer" className="text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text)]" aria-label="GitHub"><GithubIcon size={18} /></a>
           <a href="https://www.linkedin.com/company/velicode-app" target="_blank" rel="noopener noreferrer" className="text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text)]" aria-label="LinkedIn"><LinkedinIcon size={18} /></a>
+          <a href="https://www.instagram.com/velicode.app/" target="_blank" rel="noopener noreferrer" className="text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text)]" aria-label="Instagram"><InstagramIcon size={18} /></a>
+          <a href="https://www.threads.com/@velicode.app" target="_blank" rel="noopener noreferrer" className="text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text)]" aria-label="Threads"><ThreadsIcon size={18} /></a>
         </div>
       </div>
     </footer>
