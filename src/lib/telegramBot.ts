@@ -5,10 +5,8 @@ const SHEET_RANGE = "Sheet1!A:K";
 export type Stage =
   | "new"
   | "taken"
-  | "awaiting_client_info"
   | "in_progress"
   | "awaiting_review_decision"
-  | "awaiting_revision_notes"
   | "done";
 
 export interface RequestRow {
@@ -121,17 +119,11 @@ export function buildMessageText(row: RequestRow): string {
     case "taken":
       text += `\n\n🟡 <b>Taken into work.</b>`;
       break;
-    case "awaiting_client_info":
-      text += `\n\n✍️ <i>Reply to this message with the client info you learned.</i>`;
-      break;
     case "in_progress":
       text += `\n\n🔵 <b>In progress.</b>`;
       break;
     case "awaiting_review_decision":
       text += `\n\n🟣 <b>Sent for review.</b>`;
-      break;
-    case "awaiting_revision_notes":
-      text += `\n\n✍️ <i>Reply to this message with the revisions needed.</i>`;
       break;
     case "done":
       text += `\n\n✅ <b>Completed.</b>`;
@@ -141,17 +133,23 @@ export function buildMessageText(row: RequestRow): string {
   return text;
 }
 
+const MINI_APP_URL = "https://www.velicode.app/telegram-form";
+
 export function buildKeyboard(stage: Stage, timestamp: string) {
   const btn = (text: string, action: string) => ({ text, callback_data: `${action}:${timestamp}` });
+  const webAppBtn = (text: string, type: "clientInfo" | "revision") => ({
+    text,
+    web_app: { url: `${MINI_APP_URL}?ts=${encodeURIComponent(timestamp)}&type=${type}` },
+  });
   switch (stage) {
     case "new":
       return { inline_keyboard: [[btn("✅ Взяти в роботу", "take")]] };
     case "taken":
-      return { inline_keyboard: [[btn("🚀 Приступаємо до роботи", "start")]] };
+      return { inline_keyboard: [[webAppBtn("🚀 Приступаємо до роботи", "clientInfo")]] };
     case "in_progress":
       return { inline_keyboard: [[btn("📤 Відправка на перевірку", "review")]] };
     case "awaiting_review_decision":
-      return { inline_keyboard: [[btn("✅ Робота завершена", "done"), btn("✏️ Потрібні правки", "revise")]] };
+      return { inline_keyboard: [[btn("✅ Робота завершена", "done"), webAppBtn("✏️ Потрібні правки", "revision")]] };
     default:
       return undefined;
   }
@@ -166,4 +164,27 @@ export async function telegramCall(method: string, payload: Record<string, unkno
     body: JSON.stringify(payload),
   });
   return res.json();
+}
+
+// Validates Telegram WebApp initData per the official algorithm:
+// https://core.telegram.org/bots/webapps#validating-data-received-via-the-web-app
+export async function validateInitData(initData: string): Promise<boolean> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  if (!token) return false;
+  const crypto = await import("crypto");
+
+  const params = new URLSearchParams(initData);
+  const hash = params.get("hash");
+  if (!hash) return false;
+  params.delete("hash");
+
+  const dataCheckString = [...params.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([k, v]) => `${k}=${v}`)
+    .join("\n");
+
+  const secretKey = crypto.createHmac("sha256", "WebAppData").update(token).digest();
+  const computedHash = crypto.createHmac("sha256", secretKey).update(dataCheckString).digest("hex");
+
+  return computedHash === hash;
 }
